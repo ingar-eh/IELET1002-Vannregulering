@@ -103,10 +103,9 @@ float returnAverage(){
 
 void loop()
 {
-  if (average < 100){
+  if (average < 100){ //Mock
     fetchCommands();
   }
-  fetchCommands();
   manual();
   if (manualState == true){
     digitalWrite(blueLed, HIGH);
