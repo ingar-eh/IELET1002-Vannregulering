@@ -1,9 +1,32 @@
-int deviceID = 1; //Hver ESP har sin egen deviceID
+//Importerer bibilotek for SPI-kommunikasjon, samt RF-modulens bibliotek
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
+//Definerer CE og CSN-pinnene som RF-modulen bruker
+#define CE 17
+#define CSN 5
+
+//Kommunikasjonsadressen
+//Merk at begge enhetene deler samme adresse
+const byte thisSlaveAddress[] = {'E', 'S', 'P', '0', '2'};
+
+//Starter en RF24-objekt
+RF24 radio(CE, CSN);
+
+char dataReceived[10];                                             //Dataen som blir mottatt
+int returnArray[3];      //ACK-payload
+bool newData = false;                                              //Sjekker om ny data skal mottas
+
+//Deklarering av funksjoner
+void getData(void);
+void showData(void);
+void updateReplyData(void);
+
 int maxWaterLevel = 39; //Max høyde på vann i cm i tanken
 int sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
 int discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
 //dette er for å fjerne useriøse sensormålinger som kan oppstå
-int returnArray[4] = {}; //Et array som skal inneholde deviceID, ventil open / closed, automatisk / manuell og sensorverdi
 int sendInterval = 1000; //Intervallet i millisekund vi skal sende data
 int triggerPin = 26;
 int echoPin = 14;
@@ -28,7 +51,17 @@ bool manualState;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
+  
+  Serial.println("Receiver with ACK payload starting: ");
+  radio.begin();                                            //Starter RF-modulen
+  radio.setDataRate(RF24_250KBPS);                          //Oppsett av data rate
+  radio.openReadingPipe(1, thisSlaveAddress);               //Åpner en lesingkanal
+
+  radio.enableAckPayload();                                 //Aktiverer ACK-signalet
+  radio.startListening();                                   //Starter receiver-modus
+
+  radio.writeAckPayload(1, &returnArray, sizeof(returnArray));      //Skriver ACK-payload i minnet
   pinMode(redLed, OUTPUT);
   pinMode(greenLed, OUTPUT);
   pinMode(blueLed, OUTPUT);
@@ -115,10 +148,10 @@ bool valveControl(bool manualState, bool remoteSignal) //valveControl leser høy
   }
 }
 
-int readyArray(int deviceID, bool valveOpen, bool manualState, int average) //Gjør dataen klar for sending ved å konvertere alle verdier til int
+int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen klar for sending ved å konvertere alle verdier til int
 {
-  return returnArray[0] = deviceID, returnArray[1] = int(valveOpen), 
-  returnArray[2] = int(manualState), returnArray[3] = average;
+  return returnArray[0] = int(valveOpen), 
+  returnArray[1] = int(manualState), returnArray[2] = average;
 }
 
 void loop()
@@ -135,8 +168,83 @@ void loop()
     prevTime2 = currTime2;
     
     returnAverage();
+       
+    readyArray(valveOpen, manualState, average);
+    //Serial.println(returnArray[3]);
     
-    readyArray(deviceID, valveOpen, manualState, average);
-    Serial.println(returnArray[3]);
+    getData();                                                
+    showData();
   }
 } 
+
+/*
+ * Funksjon som får data fra transmitter-enheten
+ * Argumenter - ingen
+ * Gir tilbake - ingenting
+ * 
+ * Variabler brukt i funksjonen:
+ * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
+ * newData ---> Viser om vi har ny data som skal skrives ut
+ */
+void getData() {
+  //Hvis det er bytes i bufferen til radio-enheten (hvis informasjon skal leses)
+  if(radio.available()){
+    radio.read(&dataReceived, sizeof(dataReceived));            //les informasjonen
+    updateReplyData();                                          //Oppdater svar data (sjekk funksjonen nedenfor)
+    newData = true;                                             //Data har blitt mottatt
+  }
+}
+
+//========
+
+/*
+ * Funksjon som skriver ut mottatt data og ACK-payload som blir sendt tilbake
+ * Argumenter - ingen
+ * Gir tilbake - ingenting
+ * 
+ * Variabler brukt i funksjonen:
+ * newData ---> Viser om vi har ny data som skal skrives ut
+ * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
+ * ackData ---> Data som står i ACK-payload
+ */
+void showData() {
+  //Hvis vi har mottatt data, skriver vi ut dataen og ACK-payload som er sendt tilbake
+  if(newData == true){
+    Serial.print("Data received ");
+    Serial.println(dataReceived);
+    Serial.print("ACK payload sent: ");
+    Serial.print(returnArray[0]);
+    Serial.print(", ");
+    Serial.print(returnArray[1]);
+    Serial.print(", ");
+    Serial.println(returnArray[2]);
+    newData = false;                      //Reset newData slik at vi får ny data i neste innsending
+  }
+}
+
+//========
+
+/*
+ * Funksjon som oppdaterer svardata
+ * Argumenter - ingen
+ * Gir tilbake - ingenting
+ * 
+ * Variabler brukt i funksjonen:
+ * ackData ---> Data som står i ACK-payload
+ */
+void updateReplyData() {
+  readyArray(valveOpen, manualState, average);
+  //Oppdaterer ACK-payload (i dette tilfellet viser det bare hvor mange ACK-payloads vi har sendt)
+  //ackData[0] -= 1;
+  //ackData[1] -= 1;
+  //Hvis det første elementet i ACK-payload er mindre enn 100, gjenopprett det
+  //Hvis det andre elementet i ACK-payload er mindre enn -4009, gjenopprett det
+  //if(ackData[0] < 100) {
+    //ackData[0] = 109;
+  //}
+  //if(ackData[1] < -4009){
+    //ackData[1] = -4000;
+  //}
+  //Skriv de nye verdiene i ACK-payload
+  radio.writeAckPayload(1, &returnArray, sizeof(returnArray));
+}
