@@ -23,7 +23,7 @@ void getData(void);
 void showData(void);
 void updateReplyData(void);
 
-int maxWaterLevel = 39; //Max høyde på vann i cm i tanken
+int maxWaterLevel = 390; //Max høyde på vann i cm i tanken
 int sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
 int discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
 //dette er for å fjerne useriøse sensormålinger som kan oppstå
@@ -88,7 +88,7 @@ int returnAverage()//Tar sequence antall sensormålinger og returnerer gjennomsn
  prevAvg = average;
  sum = 0;
  for (int i = 0; i < sequence; i++){
-      sum = sum + (0.01723 * readUltrasonicDistance(triggerPin, echoPin)); //Ganger med 0.01723 for å gjøre om til centimeter
+      sum = sum + (0.1723 * readUltrasonicDistance(triggerPin, echoPin)); //Ganger med 0.1723 for å gjøre om til millimeter
       delay(50); //Må sette en liten brems på hver sensormåling, ellers klikker sensoren
       if (i == (sequence - 1)){
         average = sum / sequence;
@@ -154,29 +154,6 @@ int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen kla
   returnArray[1] = int(manualState), returnArray[2] = average;
 }
 
-void loop()
-{
- checkManual();
- 
- if (manualState == true && pinger == 1 || manualState == false && remoteSignal == true){
-  valveControl(manualState, remoteSignal);
-  pinger = 0;
-  }
-  
-  unsigned long currTime2 = millis();
-  if (currTime2 - prevTime2 >= sendInterval){
-    prevTime2 = currTime2;
-    
-    returnAverage();
-       
-    readyArray(valveOpen, manualState, average);
-    //Serial.println(returnArray[3]);
-    
-    getData();                                                
-    showData();
-  }
-} 
-
 /*
  * Funksjon som får data fra transmitter-enheten
  * Argumenter - ingen
@@ -230,21 +207,32 @@ void showData() {
  * Gir tilbake - ingenting
  * 
  * Variabler brukt i funksjonen:
- * ackData ---> Data som står i ACK-payload
+ * readyArray ---> Data som står i ACK-payload
  */
 void updateReplyData() {
   readyArray(valveOpen, manualState, average);
-  //Oppdaterer ACK-payload (i dette tilfellet viser det bare hvor mange ACK-payloads vi har sendt)
-  //ackData[0] -= 1;
-  //ackData[1] -= 1;
-  //Hvis det første elementet i ACK-payload er mindre enn 100, gjenopprett det
-  //Hvis det andre elementet i ACK-payload er mindre enn -4009, gjenopprett det
-  //if(ackData[0] < 100) {
-    //ackData[0] = 109;
-  //}
-  //if(ackData[1] < -4009){
-    //ackData[1] = -4000;
-  //}
-  //Skriv de nye verdiene i ACK-payload
   radio.writeAckPayload(1, &returnArray, sizeof(returnArray));
 }
+
+void loop()
+{
+ checkManual();
+ 
+ if (manualState == true && pinger == 1 || manualState == false && remoteSignal == true){
+  valveControl(manualState, remoteSignal);
+  pinger = 0;
+  }
+  
+  unsigned long currTime2 = millis();
+  if (currTime2 - prevTime2 >= sendInterval){
+    prevTime2 = currTime2;
+    
+    returnAverage();
+       
+    readyArray(valveOpen, manualState, average);
+    //Serial.println(returnArray[3]);
+    
+    getData();                                                
+    showData();
+  }
+} 
