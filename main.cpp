@@ -9,12 +9,13 @@
 
 //Kommunikasjonsadressen
 //Merk at begge enhetene deler samme adresse
-const byte thisSlaveAddress[5] = {'E', 'S', 'P', '0', '3'};
+const byte thisSlaveAddress[5] = {'E', 'S', 'P', '0', '2'};
 
 //Starter en RF24-objekt
 RF24 radio(CE, CSN);
 
-byte piControl = 1;       //Dataen som blir mottatt
+byte piControl;       //Dataen som blir mottatt
+byte remote;
 int returnArray[3];      //ACK-payload
 bool newData = false;    //Sjekker om ny data skal mottas
 
@@ -44,7 +45,7 @@ int readState; //Leser venstre knapp for å finne ut om ESP skal settes i manuel
 bool manualState;
 
 //Deklarering av funksjoner
-void getData(void);
+byte getData(void);
 void showData(void);
 void updateReplyData(void);
 
@@ -172,22 +173,36 @@ bool checkManual()
  * manualState --> om den er i manuellkontroll
  * piControl --> om den mottar signal fra Pi'en
  */
-bool valveControl(bool manualState, byte piControl)
+bool valveControl(bool manualState, byte piControl, byte remote)
 {
   valveState = analogRead(rightButton);
-  if (valveState > 4000){ //Støy i høyre knapp som gir en konstant lav spenning gjennom pin'en,
+  if (valveState > 4000 && manualState == 1){ //Støy i høyre knapp som gir en konstant lav spenning gjennom pin'en,
     //må derfor definere som > 4000 istedet for true
     valveOpen = !valveOpen;
-    if (valveOpen == false || manualState == false && piControl == false){
+    if (valveOpen == false){
       digitalWrite(redLed, HIGH);
       digitalWrite(greenLed, LOW);
       digitalWrite(enableMOSFET, LOW);     
-      }
-     else if (valveOpen == true || manualState == false && piControl == false){
+      } 
+     else if (valveOpen == true){
       digitalWrite(redLed, LOW);
       digitalWrite(greenLed, HIGH);
       digitalWrite(enableMOSFET, HIGH);
       }
+  }
+  else if (manualState == false && remote == 1){
+    if (piControl == 0){
+      digitalWrite(redLed, HIGH);
+      digitalWrite(greenLed, LOW);
+      digitalWrite(enableMOSFET, LOW);
+      return valveOpen = false;
+    }
+    else{
+      digitalWrite(redLed, LOW);
+      digitalWrite(greenLed, HIGH);
+      digitalWrite(enableMOSFET, HIGH);
+      return valveOpen = true;
+    }
   }
 }
 //========
@@ -216,13 +231,14 @@ int readyArray(bool valveOpen, bool manualState, int average)
  * piControl ---> Datastreng mottatt fra RF-kommunikasjon
  * newData ---> Viser om vi har ny data som skal skrives ut
  */
-void getData()
+byte getData()
 {
   //Hvis det er bytes i bufferen til radio-enheten (hvis informasjon skal leses)
   if(radio.available()){
     radio.read(&piControl, sizeof(piControl));      //les informasjonen
     updateReplyData();                              //Oppdater svar data (sjekk funksjonen nedenfor)
-    newData = true;                                 //Data har blitt mottatt
+    newData = true;
+    return piControl;//Data har blitt mottatt
   }
 }
 
@@ -275,12 +291,13 @@ void updateReplyData()
 void loop()
 {
  checkManual();
- 
- if (manualState == true && pinger == 1 || manualState == false && piControl == true){
-  valveControl(manualState, piControl);
+ if (manualState == true && pinger == 1){
+  valveControl(manualState, piControl, remote = 0);
   pinger = 0;
   }
-  
+ else if(manualState == false){
+  valveControl(manualState, piControl, remote = 1);
+ }
   unsigned long currTime2 = millis();
   if (currTime2 - prevTime2 >= sendInterval){
     prevTime2 = currTime2;
@@ -291,4 +308,5 @@ void loop()
   }
   getData();                                                
   showData();
+  
 } 
