@@ -162,7 +162,8 @@ int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen kla
  * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
  * newData ---> Viser om vi har ny data som skal skrives ut
  */
-void getData() {
+void getData()
+{
   //Hvis det er bytes i bufferen til radio-enheten (hvis informasjon skal leses)
   if(radio.available()){
     radio.read(&piControl, sizeof(piControl));            //les informasjonen
@@ -183,7 +184,8 @@ void getData() {
  * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
  * ackData ---> Data som står i ACK-payload
  */
-void showData() {
+void showData()
+{
   //Hvis vi har mottatt data, skriver vi ut dataen og ACK-payload som er sendt tilbake
   if(newData == true){
     Serial.print("Data received ");
@@ -208,7 +210,8 @@ void showData() {
  * Variabler brukt i funksjonen:
  * readyArray ---> Data som står i ACK-payload
  */
-void updateReplyData() {
+void updateReplyData()
+{
   readyArray(valveOpen, manualState, average);
   radio.writeAckPayload(1, &returnArray, sizeof(returnArray));
 }
