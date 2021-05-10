@@ -9,7 +9,7 @@
 
 //Kommunikasjonsadressen
 //Merk at begge enhetene deler samme adresse
-const byte thisSlaveAddress[] = {'E', 'S', 'P', '0', '2'};
+const byte thisSlaveAddress[] = {'E', 'S', 'P', '0', '1'};
 
 //Starter en RF24-objekt
 RF24 radio(CE, CSN);
