@@ -14,7 +14,7 @@ const byte thisSlaveAddress[] = {'E', 'S', 'P', '0', '2'};
 //Starter en RF24-objekt
 RF24 radio(CE, CSN);
 
-char dataReceived[10];                                             //Dataen som blir mottatt
+byte piControl;                                             //Dataen som blir mottatt
 int returnArray[3];      //ACK-payload
 bool newData = false;                                              //Sjekker om ny data skal mottas
 
@@ -23,24 +23,23 @@ void getData(void);
 void showData(void);
 void updateReplyData(void);
 
-int maxWaterLevel = 390; //Max høyde på vann i cm i tanken
-int sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
-int discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
+#define maxWaterLevel = 390; //Max høyde på vann i cm i tanken
+#define sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
+#define discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
 //dette er for å fjerne useriøse sensormålinger som kan oppstå
-int sendInterval = 1000; //Intervallet i millisekund vi skal sende data
-int triggerPin = 26;
-int echoPin = 14;
-int greenLed = 12;
-int redLed = 27;
-int blueLed = 13;
-int rightButton = 35;
-int leftButton = 34;
-int enableMOSFET = 25;
+#define sendInterval = 1000; //Intervallet i millisekund vi skal sende data
+#define triggerPin = 26;
+#define echoPin = 14;
+#define greenLed = 12;
+#define redLed = 27;
+#define blueLed = 13;
+#define rightButton = 35;
+#define leftButton = 34;
+#define enableMOSFET = 25;
 unsigned long prevTime1 = 0; //Brukes i millis()
 unsigned long prevTime2 = 0;
 int counter = 0;
-int pinger = 0;
-bool remoteSignal = false;
+byte pinger = 0;
 int sum;
 int average; //Gjennomsnittet av sequence antal sensormålinger
 int prevAvg;
@@ -129,18 +128,18 @@ bool checkManual()//checkManual() leser venstre knapp for å finne ut om program
    }
  }
 
-bool valveControl(bool manualState, bool remoteSignal) //valveControl leser høyre knapp for å åpne / lukke ventil, eller leser remoteSignal for å åpne / lukke ventil
+bool valveControl(bool manualState, byte piControl) //valveControl leser høyre knapp for å åpne / lukke ventil, eller leser remoteSignal for å åpne / lukke ventil
 {
   valveState = analogRead(rightButton);
   if (valveState > 4000){ //Støy i høyre knapp som gir en konstant lav spenning gjennom pin'en,
     //må derfor definere som > 4000 istedet for true
     valveOpen = !valveOpen;
-    if (valveOpen == false || manualState == false && remoteSignal == false){
+    if (valveOpen == false || manualState == false && piControl == false){
       digitalWrite(redLed, HIGH);
       digitalWrite(greenLed, LOW);
       digitalWrite(enableMOSFET, LOW);     
       }
-     else if (valveOpen == true || manualState == false && remoteSignal == false){
+     else if (valveOpen == true || manualState == false && piControl == false){
       digitalWrite(redLed, LOW);
       digitalWrite(greenLed, HIGH);
       digitalWrite(enableMOSFET, HIGH);
@@ -166,7 +165,7 @@ int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen kla
 void getData() {
   //Hvis det er bytes i bufferen til radio-enheten (hvis informasjon skal leses)
   if(radio.available()){
-    radio.read(&dataReceived, sizeof(dataReceived));            //les informasjonen
+    radio.read(&piControl, sizeof(piControl));            //les informasjonen
     updateReplyData();                                          //Oppdater svar data (sjekk funksjonen nedenfor)
     newData = true;                                             //Data har blitt mottatt
   }
@@ -188,7 +187,7 @@ void showData() {
   //Hvis vi har mottatt data, skriver vi ut dataen og ACK-payload som er sendt tilbake
   if(newData == true){
     Serial.print("Data received ");
-    Serial.println(dataReceived);
+    Serial.println(piControl);
     Serial.print("ACK payload sent: ");
     Serial.print(returnArray[0]);
     Serial.print(", ");
@@ -218,8 +217,8 @@ void loop()
 {
  checkManual();
  
- if (manualState == true && pinger == 1 || manualState == false && remoteSignal == true){
-  valveControl(manualState, remoteSignal);
+ if (manualState == true && pinger == 1 || manualState == false && piControl == true){
+  valveControl(manualState, piControl);
   pinger = 0;
   }
   
