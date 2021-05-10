@@ -9,33 +9,28 @@
 
 //Kommunikasjonsadressen
 //Merk at begge enhetene deler samme adresse
-const byte thisSlaveAddress[] = {'E', 'S', 'P', '0', '1'};
+const byte thisSlaveAddress[5] = {'E', 'S', 'P', '0', '3'};
 
 //Starter en RF24-objekt
 RF24 radio(CE, CSN);
 
-byte piControl;                                             //Dataen som blir mottatt
+byte piControl = 1;       //Dataen som blir mottatt
 int returnArray[3];      //ACK-payload
-bool newData = false;                                              //Sjekker om ny data skal mottas
+bool newData = false;    //Sjekker om ny data skal mottas
 
-//Deklarering av funksjoner
-void getData(void);
-void showData(void);
-void updateReplyData(void);
-
-#define maxWaterLevel = 390; //Max høyde på vann i cm i tanken
-#define sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
-#define discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
+const int maxWaterLevel = 390; //Max høyde på vann i cm i tanken
+const int sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
+const int discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
 //dette er for å fjerne useriøse sensormålinger som kan oppstå
-#define sendInterval = 1000; //Intervallet i millisekund vi skal sende data
-#define triggerPin = 26;
-#define echoPin = 14;
-#define greenLed = 12;
-#define redLed = 27;
-#define blueLed = 13;
-#define rightButton = 35;
-#define leftButton = 34;
-#define enableMOSFET = 25;
+const int sendInterval = 5000; //Intervallet i millisekund vi skal sende data
+const int triggerPin = 14;
+const int echoPin = 26;
+const int greenLed = 12;
+const int redLed = 27;
+const int blueLed = 13;
+const int rightButton = 35;
+const int leftButton = 34;
+const int enableMOSFET = 25;
 unsigned long prevTime1 = 0; //Brukes i millis()
 unsigned long prevTime2 = 0;
 int counter = 0;
@@ -47,6 +42,11 @@ int valveState; //Leser høyre knapp for å finne ut om man skal åpne / lukke v
 bool valveOpen = false;
 int readState; //Leser venstre knapp for å finne ut om ESP skal settes i manuell modus
 bool manualState;
+
+//Deklarering av funksjoner
+void getData(void);
+void showData(void);
+void updateReplyData(void);
 
 void setup()
 {
@@ -69,8 +69,15 @@ void setup()
   pinMode(leftButton, INPUT);
   digitalWrite(redLed, HIGH);
 }
+//========
 
-float readUltrasonicDistance(int triggerPin, int echoPin) //readUltrasonicDistance leser 1 sensormåling
+/*
+ * Funksjon som tar 1 sensormåling
+ * Argumenter - triggerPin, echoPin
+ * Gir tilbake - pulseIn(echoPin, HIGH);
+ * 
+ */
+float readUltrasonicDistance(int triggerPin, int echoPin)
 {
   pinMode(triggerPin, OUTPUT);
   digitalWrite(triggerPin, LOW);
@@ -81,13 +88,27 @@ float readUltrasonicDistance(int triggerPin, int echoPin) //readUltrasonicDistan
   pinMode(echoPin, INPUT);
   return pulseIn(echoPin, HIGH);
 }
+//========
 
-int returnAverage()//Tar sequence antall sensormålinger og returnerer gjennomsnittet, filtrerer også ut useriøse verdier
+/*
+ * Funksjon som klargjør returnerer gjennomsnittet av sequence antal sensorverdier, og evt. forkaster tullete verdier
+ * Argumenter - ingen
+ * Gir tilbake - average
+ * 
+ * Variabler brukt i funksjonen:
+ * prevAvg ---> sammenlignende verdi
+ * average --> tidligere og nåverende sensorverdi
+ * sequence --> hvor mange målinger vi vil ta gjennomsnittet av
+ * sum --> summeres opp for å kunne ta gjennomsnitt
+ * discardValue --> max forskjell mellom to etterfølgende sensorverdier
+ * counter --> brukes for at koden ikke skal prøve å sammenligne når den kjøres for første gang
+ */
+int returnAverage()
 { 
  prevAvg = average;
  sum = 0;
  for (int i = 0; i < sequence; i++){
-      sum = sum + (0.1723 * readUltrasonicDistance(triggerPin, echoPin)); //Ganger med 0.1723 for å gjøre om til millimeter
+      sum = sum + (0.01723 * readUltrasonicDistance(triggerPin, echoPin)); //Ganger med 0.1723 for å gjøre om til millimeter
       delay(50); //Må sette en liten brems på hver sensormåling, ellers klikker sensoren
       if (i == (sequence - 1)){
         average = sum / sequence;
@@ -102,8 +123,19 @@ int returnAverage()//Tar sequence antall sensormålinger og returnerer gjennomsn
       }
     }
 } 
+//========
 
-bool checkManual()//checkManual() leser venstre knapp for å finne ut om programmet skal inn / ut av manuell modus,
+/*
+ * Funksjon som leser knapp og endrer manuellkontroll ettersom
+ * Argumenter - ingen
+ * Gir tilbake - manualState, pinger
+ * 
+ * Variabler brukt i funksjonen:
+ * prevTime1 ---> brukes i millis()
+ * readState --> leser venstre knapp
+ * manualState --> manuellkontroll eller ikke
+ */
+bool checkManual()
 {
   unsigned long currTime1 = millis(); //Lager et intervall slik at en knappe-endring bare kan skje med minst 1 sekunds mellomrom,
   //det er for at LED'ene ikke skal hoppe frem og tilbake 100 ganger mens knappen blir holdt nede.
@@ -127,8 +159,20 @@ bool checkManual()//checkManual() leser venstre knapp for å finne ut om program
     }
    }
  }
+//========
 
-bool valveControl(bool manualState, byte piControl) //valveControl leser høyre knapp for å åpne / lukke ventil, eller leser remoteSignal for å åpne / lukke ventil
+/*
+ * Funksjon som styrer ventilene
+ * Argumenter - manuellkontroll, Pi-kontroll
+ * Gir tilbake - ingenting
+ * 
+ * Variabler brukt i funksjonen:
+ * valveState --> om knapp blir trykt inn
+ * valveOpen --> om valve skal åpnes
+ * manualState --> om den er i manuellkontroll
+ * piControl --> om den mottar signal fra Pi'en
+ */
+bool valveControl(bool manualState, byte piControl)
 {
   valveState = analogRead(rightButton);
   if (valveState > 4000){ //Støy i høyre knapp som gir en konstant lav spenning gjennom pin'en,
@@ -146,12 +190,22 @@ bool valveControl(bool manualState, byte piControl) //valveControl leser høyre 
       }
   }
 }
+//========
 
-int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen klar for sending ved å konvertere alle verdier til int
+/*
+ * Funksjon som klargjør data for sending til Pi'en
+ * Argumenter - ventil-tilstand, manuellkontroll, sensorverdier
+ * Gir tilbake - returnArray
+ * 
+ * Variabler brukt i funksjonen:
+ * readyArray ---> Data som står i ACK-payload
+ */
+int readyArray(bool valveOpen, bool manualState, int average)
 {
   return returnArray[0] = int(valveOpen), 
   returnArray[1] = int(manualState), returnArray[2] = average;
 }
+//========
 
 /*
  * Funksjon som får data fra transmitter-enheten
@@ -159,16 +213,16 @@ int readyArray(bool valveOpen, bool manualState, int average) //Gjør dataen kla
  * Gir tilbake - ingenting
  * 
  * Variabler brukt i funksjonen:
- * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
+ * piControl ---> Datastreng mottatt fra RF-kommunikasjon
  * newData ---> Viser om vi har ny data som skal skrives ut
  */
 void getData()
 {
   //Hvis det er bytes i bufferen til radio-enheten (hvis informasjon skal leses)
   if(radio.available()){
-    radio.read(&piControl, sizeof(piControl));            //les informasjonen
-    updateReplyData();                                          //Oppdater svar data (sjekk funksjonen nedenfor)
-    newData = true;                                             //Data har blitt mottatt
+    radio.read(&piControl, sizeof(piControl));      //les informasjonen
+    updateReplyData();                              //Oppdater svar data (sjekk funksjonen nedenfor)
+    newData = true;                                 //Data har blitt mottatt
   }
 }
 
@@ -181,12 +235,11 @@ void getData()
  * 
  * Variabler brukt i funksjonen:
  * newData ---> Viser om vi har ny data som skal skrives ut
- * dataReceived ---> Datastreng mottatt fra RF-kommunikasjon
- * ackData ---> Data som står i ACK-payload
+ * piControl ---> Datastreng mottatt fra RF-kommunikasjon
+ * returnArray ---> Data som står i ACK-payload
  */
 void showData()
 {
-  //Hvis vi har mottatt data, skriver vi ut dataen og ACK-payload som er sendt tilbake
   if(newData == true){
     Serial.print("Data received ");
     Serial.println(piControl);
@@ -196,7 +249,7 @@ void showData()
     Serial.print(returnArray[1]);
     Serial.print(", ");
     Serial.println(returnArray[2]);
-    newData = false;                      //Reset newData slik at vi får ny data i neste innsending
+    newData = false;
   }
 }
 
@@ -208,7 +261,10 @@ void showData()
  * Gir tilbake - ingenting
  * 
  * Variabler brukt i funksjonen:
- * readyArray ---> Data som står i ACK-payload
+ * valveOpen ---> ventiltilstand
+ * manualState --> manuellkontroll
+ * average --> sensorverdier
+ * returnArray --> data som skal sendes
  */
 void updateReplyData()
 {
@@ -232,9 +288,7 @@ void loop()
     returnAverage();
        
     readyArray(valveOpen, manualState, average);
-    //Serial.println(returnArray[3]);
-    
-    getData();                                                
-    showData();
   }
+  getData();                                                
+  showData();
 } 
