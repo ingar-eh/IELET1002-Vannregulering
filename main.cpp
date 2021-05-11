@@ -165,7 +165,7 @@ bool checkManual()
 /*
  * Funksjon som styrer ventilene
  * Argumenter - manuellkontroll, Pi-kontroll
- * Gir tilbake - ingenting
+ * Gir tilbake - valveOpen
  * 
  * Variabler brukt i funksjonen:
  * valveState --> om knapp blir trykt inn
