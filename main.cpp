@@ -2,10 +2,7 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
-//Definerer CE og CSN-pinnene som RF-modulen bruker
-#define CE 17
-#define CSN 5
+#include <esp32_pindefs.h>
 
 //Kommunikasjonsadressen
 //Merk at begge enhetene deler samme adresse
@@ -19,19 +16,6 @@ byte remote;
 int returnArray[3];      //ACK-payload
 bool newData = false;    //Sjekker om ny data skal mottas
 
-const int maxWaterLevel = 390; //Max høyde på vann i cm i tanken
-const int sequence = 5; //Sensoren tar gjennomsnittet av x verdier 
-const int discardValue = 3; //Hvis to etterfølgende sensor verdier varierer med discardValue (cm) blir de forkastet
-//dette er for å fjerne useriøse sensormålinger som kan oppstå
-const int sendInterval = 5000; //Intervallet i millisekund vi skal sende data
-const int triggerPin = 14;
-const int echoPin = 26;
-const int greenLed = 12;
-const int redLed = 27;
-const int blueLed = 13;
-const int rightButton = 35;
-const int leftButton = 34;
-const int enableMOSFET = 25;
 unsigned long prevTime1 = 0; //Brukes i millis()
 unsigned long prevTime2 = 0;
 int counter = 0;
@@ -78,7 +62,7 @@ void setup()
  * Gir tilbake - pulseIn(echoPin, HIGH);
  * 
  */
-float readUltrasonicDistance(int triggerPin, int echoPin)
+float readUltrasonicDistance()
 {
   pinMode(triggerPin, OUTPUT);
   digitalWrite(triggerPin, LOW);
@@ -109,7 +93,7 @@ int returnAverage()
  prevAvg = average;
  sum = 0;
  for (int i = 0; i < sequence; i++){
-      sum = sum + (0.01723 * readUltrasonicDistance(triggerPin, echoPin)); //Ganger med 0.1723 for å gjøre om til millimeter
+      sum = sum + (0.01723 * readUltrasonicDistance()); //Ganger med 0.1723 for å gjøre om til millimeter
       delay(50); //Må sette en liten brems på hver sensormåling, ellers klikker sensoren
       if (i == (sequence - 1)){
         average = sum / sequence;
@@ -148,15 +132,15 @@ bool checkManual()
       switch(manualState){
         case true:
           digitalWrite(blueLed, HIGH);
-          return manualState, pinger = 1;
+          return manualState, bounceBck = 1;
           break;
         case false:
           digitalWrite(blueLed, LOW);
-          return manualState, pinger = 1;
+          return manualState, bounceBck = 1;
       }
     }
     else{
-      return manualState, pinger = 1; 
+      return manualState, bounceBck = 1; 
     }
    }
  }
