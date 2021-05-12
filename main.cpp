@@ -35,7 +35,7 @@ const int enableMOSFET = 25;
 unsigned long prevTime1 = 0; //Brukes i millis()
 unsigned long prevTime2 = 0;
 int counter = 0;
-byte pinger = 0;
+byte bounceBck = 0;
 int sum;
 int average; //Gjennomsnittet av sequence antal sensormålinger
 int prevAvg;
@@ -291,12 +291,12 @@ void updateReplyData()
 void loop()
 {
  checkManual();
- if (manualState == true && pinger == 1){
-  valveControl(manualState, piControl, remote = 0);
-  pinger = 0;
+ if (manualState == true && bounceBck == 1){
+  valveControl(manualState, piControl, 0);
+  bounceBck = 0;
   }
  else if(manualState == false){
-  valveControl(manualState, piControl, remote = 1);
+  valveControl(manualState, piControl, 1);
  }
   unsigned long currTime2 = millis();
   if (currTime2 - prevTime2 >= sendInterval){
