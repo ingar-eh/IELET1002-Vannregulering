@@ -292,5 +292,4 @@ void loop()
   }
   getData();                                                
   showData();
-  
 } 
