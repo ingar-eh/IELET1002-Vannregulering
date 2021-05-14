@@ -1,0 +1,1 @@
+Ansvarlig for arduino programmering og effektivisering av koden.

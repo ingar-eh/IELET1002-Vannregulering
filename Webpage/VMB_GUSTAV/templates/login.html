@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Include base template for headers -->
+  {% include 'Layout/header.html' %}
+
+  <!-- Load static filter -->
+  {% load static %}
+
+  <!-- Load stylesheets for website -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/loginStyle.css' %}">
+</head>
+<body class="loginBackgroundPicture" style="background-image: url('../static/pictures/Login.jpg');">
+  <!-- Include base template for menu -->
+  {% include 'Layout/menu.html' %}
+
+  <!-- Login form -->
+  <div class="loginBox">
+    <h1 class="textHeader2" style="text-align: center; margin: 2vh 0;">
+      Logg inn
+    </h1>
+
+    <!--
+    action sends the submitted data to the specified url
+    we send data to the same url to handle register data
+    IMPORTANT: We use POST method, we post sensitive data so we send data through a file
+    -->
+    <form class="text4" target="_self" action="/login/" method="post">
+      <!-- All this data that will be sent from inputs are going to be sent as a encrypted token, to protect from hacks -->
+      {% csrf_token %}
+
+      <!-- We display the form instance we created with django authentication form instance -->
+      {{auth}}
+
+      <div style="text-align: center; margin-top: 4%">
+        <input class="loginButton text4" type="submit" value="Logg inn">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

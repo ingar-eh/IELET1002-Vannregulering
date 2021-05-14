@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Include base template for headers -->
+  {% include 'Layout/header.html' %}
+
+  <!-- Load static filter -->
+  {% load static %}
+
+  <!-- Load stylesheets for website -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/aboutUsStyle.css' %}">
+</head>
+<body style="background-color: rgb(255,255,255); padding: 0; margin: 0; width: 100%;">
+  <!-- Include base template for menu -->
+  {% include 'Layout/menu.html' %}
+
+  <!-- Intro -->
+  <div class="aboutUsFrontPicture" style="background-image: url('../static/pictures/AboutUs/aboutUs.jpg');">
+    <svg style="width: 100%; height: 100%;">
+      <!-- Gradient styles -->
+      <defs style="width: 100%; height: 100%;">
+        <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0" style="stop-color: rgb(0,0,0); stop-opacity: 1;"></stop>
+          <stop offset="100%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0;"></stop>
+        </linearGradient>
+      </defs>
+
+      <!-- Draw the gradient over the background -->
+      <rect class="rectangle2" x="0" y="0" fill="url(#gradient2)"></rect>
+
+      <!-- Text -->
+      <text class="textHeader1" x="31%" y="50%" fill="rgb(255, 255, 255)">
+        VMB GUSTAV
+      </text>
+    </svg>
+  </div>
+  <div style="margin-top: 10vh;"></div> <!-- Big space -->
+  <section class="text1" style="text-align: center; font-size: 2vw; width: 100%;">
+    {{intro}}
+  </section>
+  <div style="margin-top: 30vh;"></div> <!-- Big space -->
+
+  <!-- Different parts of project -->
+  <div class="box1">
+    <!--
+    A for loop to loop through all the data that was passed through the server
+    Django loops are python loops
+    We loop through object list
+    We take out different data in every object one by one until the whole list is done cycling through
+    -->
+    {% for content in infoList %}
+
+    <article class="box1Colon1">
+      <b><header class="textHeader5"> {{content.header}} </header></b>
+      <i class="text2"> - {{content.name}} </i>
+      <section class="text1">
+        {{content.text}}
+      </section>
+    </article>
+    <figure class="box1Colon2">
+      <img src="{% static content.picture %}" alt="None">
+    </figure>
+    <div style="clear: both;"></div> <!-- Clear all display settings -->
+    <div style="margin-top: 20vh;"></div> <!-- Big space -->
+
+    {% endfor %}
+  </div>
+</body>
+</html>

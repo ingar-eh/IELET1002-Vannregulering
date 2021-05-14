@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--
+    Include base template for headers
+    This is a django tag
+    It is a prebuilt function that includes code from other html templates and pastes them inside to render with the rest of the content
+    -->
+    {% include 'Layout/header.html' %}
+
+    <!--
+    Load static filter
+    This makes it possible to request static files from the server
+    -->
+    {% load static %}
+
+    <!-- Load stylesheets for website -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/homepageStyle.css' %}">
+</head>
+<body class="homepageBackgroundPicture" style="background-image: url('../static/pictures/HomepagePic1.jpg');">
+    <!-- Include base template for menu -->
+    {% include 'Layout/menu.html' %}
+
+    <!-- Display -->
+    <svg style="width: 100%; height: 100vh; overflow: hidden;">
+        <!-- Gradient styles -->
+        <defs>
+            <radialGradient id="gradient1" cx="90%" cy="60%" r="70%" fx="90%" fy="30%">
+                <stop offset="20%" style="stop-color: rgba(0, 0, 0, 0); stop-opacity: 0;"></stop>
+                <stop offset="80%" style="stop-color: rgb(0,0,0); stop-opacity: 1;"></stop>
+            </radialGradient>
+        </defs>
+
+        <!-- Draw the gradient over the background -->
+        <rect class="rectangle1" x="0" y="0" fill="url(#gradient1)"></rect>
+
+        <!-- Text -->
+        <text class="textHeader1" x="2%" y="16%" fill="rgb(255, 255, 255)">
+            VMB GUSTAV
+        </text>
+        <text class="textHeader4" x="3%" y="30%" fill="rgb(255, 255, 255)"> Vannregulering </text>
+        <text class="textHeader4" x="3%" y="35%" fill="rgb(255, 255, 255)"> for </text>
+        <text class="textHeader4" x="3%" y="40%" fill="rgb(255, 255, 255)"> Make Benefit </text>
+        <text class="textHeader4" x="3%" y="45%" fill="rgb(255, 255, 255)"> Great Uinversity </text>
+        <text class="textHeader4" x="3%" y="50%" fill="rgb(255, 255, 255)"> of </text>
+        <text class="textHeader4" x="3%" y="55%" fill="rgb(255, 255, 255)"> Science </text>
+        <text class="textHeader4" x="3%" y="60%" fill="rgb(255, 255, 255)"> and </text>
+        <text class="textHeader4" x="3%" y="65%" fill="rgb(255, 255, 255)"> Tech </text>
+        <text class="textHeader4" x="3%" y="70%" fill="rgb(255, 255, 255)"> of </text>
+        <text class="textHeader4" x="3%" y="75%" fill="rgb(255, 255, 255)"> Academic Validity </text>
+    </svg>
+</body>
+</html>

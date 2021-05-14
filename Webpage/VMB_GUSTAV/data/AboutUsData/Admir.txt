@@ -1,0 +1,3 @@
+Ansvarlig for den mekaniske delen og modelerte hyllen, isolering av bøttene, samt en analyse om energigenerering fra turbiner. Ansvarlig for kommunikasjon mellom ESP32 og Raspberry Pi.
+
+  P.S. Jobbet med turbinedesign i 2 måneder og fant plutselig ut at det ikke var nok trykk for å få turbinen til å funke

@@ -1,0 +1,1 @@
+Ansvarlig for nettsidelaging og kommunikasjon mellom klienten og serveren. Utviklet både front-end (html, css, js) og back-end (python + django) koden for nettside.

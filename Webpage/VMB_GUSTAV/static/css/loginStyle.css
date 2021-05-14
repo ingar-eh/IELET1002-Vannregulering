@@ -1,0 +1,60 @@
+/* ---------- Background picture ---------- */
+.loginBackgroundPicture {
+    background-color: rgb(10,10,10);
+    margin: 0;
+    padding: 0;
+
+    /* If the content of the page is over 100%, hide the content */
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    /* Center and scale the image */
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+/* ---------- Login menu ---------- */
+.loginBox {
+    box-sizing: border-box;
+    height: 60vh;
+    width: 50vw;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 15vh;
+}
+
+/* ---------- Button ---------- */
+.loginButton {
+    width: 40%;
+    height: 8vh;
+
+    /* Remove button style */
+    border: none;
+}
+.loginButton:hover {
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+/* ---------- Form styles ---------- */
+/*
+The form tags of the automatically created instance methods that are passed down to the url with the html code
+Specific methods in the instance that are passed down to html have custom tags that we can manipulate
+*/
+form {
+    margin: 0 15%;
+}
+/* Label style */
+form label {
+    font-family: "Bell MT", serif;
+    font-size: 3vw;
+}
+/* Input style */
+form input[type="text"], form input[type="password"] {
+    font-size: 2vw;
+    width: 100%;
+    height: 10%;
+    display: block;
+}

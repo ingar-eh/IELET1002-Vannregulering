@@ -1,0 +1,20 @@
+/* ---------- Background picture ---------- */
+body.homepageBackgroundPicture {
+    background-color: rgb(10,10,10);
+    margin: 0;
+    padding: 0;
+
+    /* If the content of the page is over 100%, hide the content */
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+
+    /* Center and scale the image */
+    background-size: 100%;
+}
+
+/* ---------- Shape ---------- */
+rect.rectangle1 {
+    width: 100vw;
+    height: 100vh;
+}

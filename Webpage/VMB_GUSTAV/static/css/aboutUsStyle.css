@@ -1,0 +1,64 @@
+/* ---------- Front picture ---------- */
+.aboutUsFrontPicture {
+    background-color: rgb(10,10,10);
+    margin: 0;
+    padding: 0;
+
+    /* If the content of the page is over 100%, hide the content */
+    width: 100%;
+    height: 50vh;
+    overflow: hidden;
+
+    /* Center and scale the image */
+    background-size: 100%;
+}
+
+/* ---------- Shape ---------- */
+rect.rectangle2 {
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ---------- Border box layout ---------- */
+/*THe big box that has all its objects*/
+.box1 {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/* Box object properties */
+.box1Colon1 {
+    /* Set content to the left first half of the screen */
+    float: left;
+    width: 50%;
+    height: 60vh;
+
+    /* Align object */
+    margin: 0;
+    padding: 0;
+}
+/* Box object content properties */
+.box1Colon1 * {
+    /* Everything inside will be aligned */
+    margin-left: 5vw;
+}
+/* Box object properties */
+.box1Colon2 {
+    /* Set content to the left second half of the screen */
+    float: left;
+    width: 50%;
+    height: 60vh;
+
+    /* Align object */
+    margin: 0;
+    padding: 0;
+}
+/* Box object content properties */
+.box1Colon2 img {
+    width: 60%;
+
+    /* Align picture to the center of the box */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

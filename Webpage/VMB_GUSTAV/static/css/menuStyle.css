@@ -1,0 +1,119 @@
+/* ---------- Menu ---------- */
+/* The menu object itself */
+div.menu {
+    /* Background color for object */
+    background-color: rgb(0, 0, 0);
+    /* Offset object relative to other objects */
+    margin: 0;
+    padding: 0;
+    /* If content gets out of the object, hide it and prevent it from interacting with other objects */
+    overflow: hidden;
+    /* The menu is position at the very top of the website */
+    top: 0;
+}
+/* List object where all the content in the menu will be stored */
+div.menu a {
+    padding: 3vh 3vw;
+    /* Color of the text in the object */
+    color: inherit;
+    /* Object will move as left as possible til it collides with other objects */
+    float: left;
+    /* Display content in the object in the center */
+    text-align: center;
+    /* Delete any text decoration that is preset */
+    text-decoration: none;
+    /* When interacting with object the cursor is in pointer style */
+    cursor: pointer;
+    /* The user can't select object content */
+    user-select: none;
+
+    /* When a event happens transition to that events background color property in 1 second */
+    transition: background-color 1s;
+}
+
+
+
+/* ---------- Dropdown Menu ---------- */
+/* Drop down box object */
+div.menuDropdownBox {
+    float: left;
+    overflow: hidden;
+    /* Set display method that divides objects into blocks */
+    /*display: inline-block;*/
+}
+/* Drop down box button */
+div.menuDropdownBox button {
+    background-color: inherit;
+    margin: 0;
+    padding: 3vh 3vw;
+    cursor: pointer;
+    /* Delete preset button style */
+    border: none;
+    outline: none;
+
+    transition: background-color 1s;
+}
+/* Drop down box object information will go int this object */
+div.menuDropdownBox div {
+    background-color: rgb(200, 200, 200);
+    /* Position relative to the parent */
+    position: absolute;
+    /* Minimum width the object can have */
+    min-width: 25%;
+    /* Display content 1 layer above all other content no matter what */
+    z-index: 1;
+    /* Hide the content of the object */
+    display: none;
+}
+/* The content object of dropdown box object */
+div.menuDropdownBox div * {
+    text-align: left;
+    text-decoration: none;
+    padding: 1vh 1vw;
+    float: none;
+    color: rgb(0, 0, 0);
+    /*
+    Object is displayed in boxes
+    since parent has a max width but no pre set max height the box can extend in height as much as needed
+    That means the boxes will take upp 100% of width and as much height as need be
+    Content in objects will be separated
+    */
+    display: block;
+
+    transition: background-color 1s;
+}
+/* The content object of dropdown box object */
+div.menuDropdownBox div * button {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    text-decoration: none;
+    padding: 1vh 1vw;
+    float: none;
+    color: rgb(0, 0, 0);
+
+    /* Delete button decorations */
+    border: none;
+}
+div.menuDropdownBox div a form button {
+    width: 100%;
+    height: 100%;
+
+    /* Delete button decorations */
+    border: none;
+    color: blue;
+}
+
+/* ---------- Transitions ---------- */
+/* On hover the list (child) object of the menu object (parent) */
+div.menu a:hover, div.menuDropdownBox button:hover {
+    background-color: rgb(30, 30, 30);
+}
+/* When user hovers over content object have a specific style */
+div.menuDropdownBox div *:hover {
+    background-color: rgb(230, 230, 0);
+}
+/* When hover over dropdown box object the dropdown object content will be visible */
+div.menuDropdownBox:hover div {
+    display: block;
+}

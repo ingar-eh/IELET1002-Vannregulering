@@ -1,0 +1,1 @@
+Hjalp med komunikasjonsdelen mellom ESP32 og Raspberry Pi.

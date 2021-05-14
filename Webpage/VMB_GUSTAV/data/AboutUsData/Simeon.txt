@@ -1,0 +1,1 @@
+Ansvarlig for kontrollsystemet som håndterer signaler fra modellen og nettsiden, og fletter de sammen med live strømprisdata for å bestemme ventiltilstandene.

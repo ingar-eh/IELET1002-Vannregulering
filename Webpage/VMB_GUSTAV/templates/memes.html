@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Include base template for headers -->
+  {% include 'Layout/header.html' %}
+
+  <!-- Load static files -->
+  {% load static %}
+
+  <!-- Load stylesheets for website -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/memesStyle.css' %}">
+</head>
+<body id="top" style="background-color: rgb(255,255,221); padding: 0; margin: 0;">
+  <!-- Include base template for menu -->
+  {% include 'Layout/menu.html' %}
+
+  <!-- Header -->
+  <div style="margin-top: 10vh;"></div> <!-- Big space -->
+  <h1 class="textHeader2" style="text-align: center; margin-top: 10vh;">
+    &#128514; MEMES &#128514;
+  </h1>
+  <div style="margin-top: 30vh;"></div> <!-- Big space -->
+  <div class="line"></div>
+
+  <!-- Memes -->
+  {% for meme in pictureList %}
+  <div>
+    <div style="margin-top: 8vh;"></div> <!-- Big space -->
+    <img src="{% static meme.picture %}" alt="None">
+    <div style="margin-top: 8vh;"></div> <!-- Big space -->
+    <div class="line"></div> <!-- Line -->
+  </div>
+  {% endfor %}
+
+  <!-- End -->
+  <div style="margin-top: 15vh;"></div> <!-- Big space -->
+  <div style="width: 100%; text-align: center;">
+    <a class="textHeader2" href="#top" style="text-decoration: none;">
+      <b> To top &#127829; </b>
+    </a>
+  </div>
+</body>
+</html>

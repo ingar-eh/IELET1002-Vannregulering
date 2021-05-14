@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Include base template for headers -->
+  {% include 'Layout/header.html' %}
+
+  <!-- Load static files -->
+  {% load static %}
+
+  <!-- Load stylesheets for website -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/graphicalStyle.css' %}">
+
+  <!-- Import external code from internet for graph style -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.0/chart.min.js"></script>
+</head>
+<body style="background-color: rgb(255,255,220); padding: 0; margin: 0; overflow: hidden; height: 100vh;">
+  <!-- Include base template for menu -->
+  {% include 'Layout/menu.html' %}
+
+  <div class="box2">
+    <!-- Left side -->
+    <div class="box2Colon1">
+      <!-- Timestamps -->
+      <div class="box2Colon2">
+        <button id="menu1-1min"> 1 min </button>
+        <button id="menu1-10min"> 10 min </button>
+        <button id="menu1-1h"> 1 h </button>
+        <button id="menu1-24h"> 24 h </button>
+        <button id="menu1-ALL"> ALL </button>
+      </div>
+
+      <!-- Graph 1 -->
+      <div class="box2Colon3">
+        <div>
+          <canvas id="graph1" width="0" height="0"></canvas>
+        </div>
+        <canvas id="recommend1"></canvas>
+        {% if not user.is_authenticated %}
+        <div id="LoggInnDennie1">
+          <span class="text4"> Logg inn </span>
+        </div>
+        {% else %}
+        <div id="ControlDennie1" style="display: block;">
+          <span class="text4"> Manual control </span>
+        </div>
+        <button id="buttonON1" style="display: none;"> ON </button>
+        <button id="buttonOFF1" style="display: none;"> OFF </button>
+        {% endif %}
+      </div>
+
+      <!-- Graph 2 -->
+      <div class="box2Colon3">
+        <div>
+          <canvas id="graph2" width="0" height="0"></canvas>
+        </div>
+        <canvas id="recommend2"></canvas>
+        {% if not user.is_authenticated %}
+        <div id="LoggInnDennie2">
+          <span class="text4"> Logg inn </span>
+        </div>
+        {% else %}
+        <div id="ControlDennie2" style="display: block;">
+          <span class="text4"> Manual control </span>
+        </div>
+        <button id="buttonON2" style="display: none;"> ON </button>
+        <button id="buttonOFF2" style="display: none;"> OFF </button>
+        {% endif %}
+      </div>
+
+      <!-- Graph 3 -->
+      <div class="box2Colon3">
+        <div>
+          <canvas id="graph3" width="0" height="0"></canvas>
+        </div>
+        <canvas id="recommend3"></canvas>
+        {% if not user.is_authenticated %}
+        <div id="LoggInnDennie3">
+          <span class="text4"> Logg inn </span>
+        </div>
+        {% else %}
+        <div id="ControlDennie3" style="display: block;">
+          <span class="text4"> Manual control </span>
+        </div>
+        <button id="buttonON3" style="display: none;"> ON </button>
+        <button id="buttonOFF3" style="display: none;"> OFF </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="box2Colon4">
+      <!-- Timestamps -->
+      <div class="box2Colon5">
+        <button id="menu2-1h"> 1 h </button>
+        <button id="menu2-24h"> 24 h </button>
+        <button id="menu2-ALL"> ALL </button>
+      </div>
+
+      <!-- Price graph -->
+      <div class="box2Colon6">
+        <canvas id="graph4" width="0" height="0"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  Import code
+  We import it at the end because the scripts rely on pre generated objects with custom id's
+  These objects dont load until the whole page is done building
+  If we ran scripts at the start of the header, the scripts would try t find id's that dont yet exsist
+  This would return none and so error
+  We sun scripts at the end to solve this issue
+  -->
+  <script type="text/javascript" src="{% static 'scripts/graphCode1.js' %}"></script>
+  {% if user.is_authenticated %}
+    <script type="text/javascript" src="{% static 'scripts/graphCode2.js' %}"></script>
+  {% endif %}
+</body>
+</html>

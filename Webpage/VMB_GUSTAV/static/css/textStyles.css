@@ -1,0 +1,48 @@
+/* ---------- Header text style ---------- */
+.textHeader1 {
+    color: rgb(255, 255, 255);
+    font-size: 6vw;
+    font-family: "Bell MT", serif;
+}
+.textHeader2 {
+    color: rgb(0, 0, 0);
+    font-size: 6vw;
+    font-family: "Bell MT", serif;
+}
+.textHeader3 {
+    color: rgb(255, 255, 255);
+    font-size: 3vw;
+    font-family: "Bell MT", serif;
+}
+.textHeader4 {
+    color: rgb(255, 255, 255);
+    font-size: 2vw;
+    font-family: "Bell MT", serif;
+}
+.textHeader5 {
+    color: rgb(0, 0, 0);
+    font-size: 2vw;
+    font-family: "Bell MT", serif;
+}
+
+/* ---------- Text style ---------- */
+.text1 {
+    color: rgb(0, 0, 0);
+    font-size: 2vw;
+    font-family: "Bell MT", serif;
+}
+.text2 {
+    color: rgb(120, 120, 120);
+    font-size: 1.5vw;
+    font-family: "Bell MT", serif;
+}
+.text3 {
+    color: rgb(255, 255, 255);
+    font-size: 3vw;
+    font-family: "Bell MT", serif;
+}
+.text4 {
+    color: rgb(0, 0, 0);
+    font-size: 3vw;
+    font-family: "Bell MT", serif;
+}
